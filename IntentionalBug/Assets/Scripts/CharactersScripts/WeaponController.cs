@@ -1,44 +1,28 @@
 ﻿using UnityEngine;
 
 
-public class WeaponController : MonoBehaviour, IElemental
+public class WeaponController : MonoBehaviour
 { 
     [SerializeField] Transform gunPivot;
     [SerializeField] Transform gunHolder;
     [SerializeField] IElementalWeapon weapon;
-    [SerializeField] ElementalEventController elementController;
+
     [SerializeField] WeaponsEventController weaponEvent;
     [SerializeField] GunPointer pointer;
-    
 
-    Elements currentElement;
+    Elemental elemental;
+
     IWeaponInput input;
     SpriteRenderer sprite;
 
     Vector3 aimDirection;
     float aimAngle;
-    public Elements Element
-    {
-        get => currentElement; private set
-        {
-            currentElement = value;
-        }
-    }
+    
 
     private void Start()
     {
         input = GetComponent<IWeaponInput>();
-        
-    }
-
-    private void OnEnable()
-    {
-        elementController.RegisterElmentSwitch(this);
-    }
-
-    private void OnDisable()
-    {
-        elementController.DeregisterElmentSwitch(this);
+        elemental = GetComponent<Elemental>();
     }
 
     private void Update()
@@ -53,7 +37,10 @@ public class WeaponController : MonoBehaviour, IElemental
     {
         this.weapon = weapon;
         weapon.Equip();
-        weapon.SwitchElement(Element);
+        
+        if(elemental)
+            weapon.SwitchElement(elemental.Element);
+
         pointer.Deactivate();
         gunHolder.localScale = new Vector2(1, 1);
         weapon.gunTransform.parent = gunHolder;
@@ -111,11 +98,8 @@ public class WeaponController : MonoBehaviour, IElemental
 
     public void SwitchElement(Elements element)
     {
-        Element = element;
         weapon?.SwitchElement(element);
     }
-
-
-
+    
 
 }
